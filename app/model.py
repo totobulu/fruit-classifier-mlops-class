@@ -3,14 +3,15 @@ import wandb
 from loadotenv import load_env
 
 load_env(file_loc='/workspaces/fruit-classifier-mlops-class/.env')
-os.getenv('WANDB_API_KEY')
+wandb_api_key = os.getenv('WANDB_API_KEY')
+print(wandb_api_key)
 
 MODELS_DIR = 'models'
 
 os.makedirs(MODELS_DIR, exist_ok=True)
 
 def download_artifact():
-    assert 'WANDB_API_KEY' in os.environ, "Please enter the wandb API key"
+    #assert 'WANDB_API_KEY' in os.environ, "Please enter the wandb API key"
 
     wandb_org = os.environ.get('WANDB_ORG')
     wandb_project = os.environ.get('WANDB_PROJECT')
