@@ -1,17 +1,20 @@
 import os
 import wandb
-from loadotenv import load_env
+from loadotenv import load_env # remove for GCP deployment 
 from pathlib import Path
 import torch
 from torchvision.models import resnet18, ResNet
 from torch import nn
-from torchvision import transforms
-
-load_env(file_loc='/workspaces/fruit-classifier-mlops-class/.env')
-wandb_api_key = os.getenv('WANDB_API_KEY')
+from torchvision.transforms import v2 as transforms
 
 MODELS_DIR = 'models'
 MODEL_FILE_NAME = 'best_model.pth'
+
+CATEGORIES = ["freshapple", "freshbanana", "freshorange",
+              "rottenapple", "rottenbanana", "rottenorange"]
+
+load_env() # This will be removed for the GCP deployment
+wandb_api_key = os.getenv('WANDB_API_KEY')
 
 os.makedirs(MODELS_DIR, exist_ok=True)
 
@@ -55,4 +58,14 @@ def load_model() -> ResNet:
     model.eval()
     return model
 
-print(load_model())
+def load_transforms() -> transforms.Compose:
+    return transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToImage(), # this will convert the PIL image to a torch tensor with the same uint8 type
+        transforms.ToDtype(torch.float32, scale=True), # We convert the uint8 tensor to a float32 tensor and divide by 255 
+        transforms.Normalize([0.485, 0.456, 0.406],
+                             [0.229, 0.224, 0.225])
+
+    ])
+
